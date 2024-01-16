@@ -6,9 +6,11 @@ class Doc(Base):
     __tablename__ = "doc"
 
     id = Column(Integer, primary_key=True, index=True)
-    fecha = Column(Date, nullable=True)
-    numoficio = Column(String(250), nullable=True)
-    proce = Column(String(250), nullable=True)
-    asunto = Column(String(250))
+    fecha = Column(Date, nullable=False)
+    numoficio = Column(String(250), nullable=False)
+    asunto = Column(String(250), nullable=False)
+    remitente = Column(String(250), nullable=False)
     turn = Column(String(250))
+    resp = Column(String(250))
+    femi = Column(Date)
     url = Column(String(250))

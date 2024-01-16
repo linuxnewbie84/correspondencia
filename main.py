@@ -1,6 +1,6 @@
 import uvicorn
 import os
-from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi import FastAPI
 from router import usuarios
 from fastapi import Request
 from fastapi.templating import Jinja2Templates
