@@ -11,3 +11,4 @@ class Doc(Base):
     proce = Column(String(250), nullable=True)
     asunto = Column(String(250))
     turn = Column(String(250))
+    url = Column(String(250))
