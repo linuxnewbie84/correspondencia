@@ -33,8 +33,20 @@ async def created(doc:Doc_Schema, db:db_dependecy):
     return Response(status_code=HTTP_201_CREATED)
 @doct.get("/doc/bfecha", tags=["Busca por Fecha"], status_code=HTTP_200_OK)
 async def bfecha(fechadoc:str, db: db_dependecy):
-    bf = db.query(model.doc.Doc).filter(model.doc.Doc.fecha == fechadoc).first()
+    bf = db.query(model.doc.Doc).filter(model.doc.Doc.fecha == fechadoc).all()
     if bf is None:
         raise HTTPException(status_code=HTTP_404_NOT_FOUND, detail="No existe el documento")
     return bf
-#@doct.put("/doc/act", tags=["Actualizar Documento"], status_code=HTTP_202_ACCEPTED)
+
+@doct.get("/doc/boficio", tags=["Busqueda Oficio"], status_code=HTTP_200_OK)
+async def boficio(nofi:str, db:db_dependecy):
+    bo = db.query(model.doc.Doc).filter(model.doc.Doc.numoficio == nofi).first()
+    if bo is None:
+        raise HTTPException(status_code=HTTP_404_NOT_FOUND, detail="No existe el documento")
+    return bo
+@doct.put("/doc/actualizar", tags=["Actualizar Documento"], status_code=HTTP_202_ACCEPTED)
+async def acdoc(num_oficio:str,doc_ac:Doc_Schema, db:db_dependecy):
+    docact=db.query(model.doc.Doc).filter(model.doc.Doc.numoficio == num_oficio).update({"numoficio":doc_ac.numoficio,"asunto":doc_ac.asunto, "remitente":doc_ac.remitente, "turn":doc_ac.turn, "resp":doc_ac.resp, "femi":doc_ac.femi, "url":doc_ac.url})
+    if docact is None:
+        raise HTTPException(HTTP_404_NOT_FOUND, detail="Documento no encontrado")
+    return docact
