@@ -8,9 +8,8 @@ from starlette.status import (
     HTTP_404_NOT_FOUND,
 )
 import model
-from config.db import engine, Sessionlocal, Base
+from config.db import engine, Sessionlocal
 from fastapi.responses import HTMLResponse, JSONResponse
-from sqlalchemy import insert, select
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 from typing import Annotated
@@ -21,11 +20,11 @@ usr = APIRouter()
 
 admintem = Jinja2Templates(directory="templates")
 
-
+#Acceso a la base de datos
 def get_db():
     db = Sessionlocal()
     try:
-        yield db
+        yield db #Generador para iterar los datos de la base
     finally:
         db.close()
 
@@ -51,9 +50,9 @@ async def admin(request: Request):
     status_code=HTTP_201_CREATED,
 )
 async def Create(user_data: UserSchema, db: db_dependecy):
-    user_data.set_password(user_data.user_password)
-    new_user = model.user.User(**user_data.model_dump())
-    db.add(new_user)
+    user_data.set_password(user_data.user_password) #Hasheamos el password antes de guardar
+    new_user = model.user.User(**user_data.model_dump()) #Creamos un directorio
+    db.add(new_user)#Agregamos a la base en la tabla usuarios
     db.commit()
     return Response(status_code=HTTP_201_CREATED)
 
@@ -61,9 +60,8 @@ async def Create(user_data: UserSchema, db: db_dependecy):
 #!Buscar un usuario por username
 @usr.get("/user/buser", tags=["busqueda de usuario"], status_code=HTTP_200_OK)
 async def buser(user_name: str, db: db_dependecy):
-    userb = (
-        db.query(model.user.User).filter(model.user.User.username == user_name).first()
-    )
+    userb = db.query(model.user.User).filter(model.user.User.username == user_name).first() #Filtramos la busqueda por username
+    
     if userb is None:
         raise HTTPException(
             status_code=HTTP_404_NOT_FOUND, detail="Usuario no encontrado"

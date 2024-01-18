@@ -8,12 +8,13 @@ from fastapi.responses import HTMLResponse
 from model import user, doc
 from config.db import engine, Base
 from router.usuarios import usr
-
+from router.doc import doct
 
 app = FastAPI()
 app.title="Servicio de Correspondencia"
 app.version = "1.0"
 app.include_router(usr)
+app.include_router(doct)
 #app.include_router(doc)
 template= Jinja2Templates(directory="templates")
 
