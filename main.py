@@ -1,7 +1,7 @@
 import uvicorn
 import os
 from fastapi import FastAPI
-from fastapi.staticfiles import StaticFiles
+from fastapi.staticfiles import StaticFiles #Necesaria para poder utilizar las images y estilos
 from router import usuarios
 from fastapi import Request
 from fastapi.templating import Jinja2Templates
@@ -16,7 +16,7 @@ app.title="Servicio de Correspondencia"
 app.version = "1.0"
 app.include_router(usr)
 app.include_router(doct)
-app.mount("/static", StaticFiles(directory="static"), name="static")
+app.mount("/static", StaticFiles(directory="static"), name="static") #!Direcorio de imagenes, estilos y js
 template= Jinja2Templates(directory="templates")
 
 user.Base.metadata.create_all(bind = engine) #!Creamos las tablas desde los modelos 

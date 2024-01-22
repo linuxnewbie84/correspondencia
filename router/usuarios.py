@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Request, Form, Depends, HTTPException, Response
-from schemas.user_schema import UserSchema, Datalogin
+from schemas.user_schema import UserSchema
 from starlette.status import (
     HTTP_201_CREATED,
     HTTP_200_OK,
@@ -13,35 +13,24 @@ from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 from typing import Annotated
-from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.security import check_password_hash
 
 
 usr = APIRouter()
 
 admintem = Jinja2Templates(directory="templates")
 
-#Acceso a la base de datos
+
+# Acceso a la base de datos
 def get_db():
     db = Sessionlocal()
     try:
-        yield db #Generador para iterar los datos de la base
+        yield db  # Generador para iterar los datos de la base
     finally:
         db.close()
 
 
 db_dependecy = Annotated[Session, Depends(get_db)]  # Necesaria para todas las consultas
-
-
-#!Bienvenida
-@usr.get(
-    "/user",
-    tags=["Administración de Usuarios"],
-    status_code=HTTP_200_OK,
-    response_class=HTMLResponse,
-)
-async def admin(request: Request):
-    return admintem.TemplateResponse("admin.html", {"request": request})
-
 
 #!Crear usuarios
 @usr.post(
@@ -50,18 +39,22 @@ async def admin(request: Request):
     status_code=HTTP_201_CREATED,
 )
 async def Create(user_data: UserSchema, db: db_dependecy):
-    user_data.set_password(user_data.user_password) #Hasheamos el password antes de guardar
-    new_user = model.user.User(**user_data.model_dump()) #Creamos un directorio
-    db.add(new_user)#Agregamos a la base en la tabla usuarios
+    user_data.set_password(
+        user_data.user_password
+    )  # Hasheamos el password antes de guardar
+    new_user = model.user.User(**user_data.model_dump())  # Creamos un directorio
+    db.add(new_user)  # Agregamos a la base en la tabla usuarios
     db.commit()
     return Response(status_code=HTTP_201_CREATED)
 
 
 #!Buscar un usuario por username
-@usr.get("/user/buser", tags=["busqueda de usuario"], status_code=HTTP_200_OK)
+@usr.get("/usr/buser", tags=["busqueda de usuario"], status_code=HTTP_200_OK)
 async def buser(user_name: str, db: db_dependecy):
-    userb = db.query(model.user.User).filter(model.user.User.username == user_name).first() #Filtramos la busqueda por username
-    
+    userb = (
+        db.query(model.user.User).filter(model.user.User.username == user_name).first()
+    )  # Filtramos la busqueda por username
+
     if userb is None:
         raise HTTPException(
             status_code=HTTP_404_NOT_FOUND, detail="Usuario no encontrado"
@@ -70,7 +63,7 @@ async def buser(user_name: str, db: db_dependecy):
 
 
 #! Mostrar usuarios
-@usr.get("/user/todos", tags=["Mostrar usuarios"], status_code=HTTP_200_OK)
+@usr.get("/usr/todos", tags=["Mostrar usuarios"], status_code=HTTP_200_OK)
 async def mostrar(db: db_dependecy):
     todos = db.query(model.user.User).all()
     if todos is None:
@@ -83,10 +76,20 @@ async def mostrar(db: db_dependecy):
 #! Modificar Usuario
 
 
-@usr.put("/user/modificar", tags=["Modificar Usuario"], status_code=HTTP_200_OK)
+@usr.put("/usr/modificar", tags=["Modificar Usuario"], status_code=HTTP_200_OK)
 async def update(user_name: str, datos_actualizar: UserSchema, db: db_dependecy):
     datos_actualizar.set_password(datos_actualizar.user_password)
-    act = db.query(model.user.User).filter(model.user.User.username ==user_name).update({"name":datos_actualizar.name, "cargo":datos_actualizar.cargo, "user_password":datos_actualizar.user_password})
+    act = (
+        db.query(model.user.User)
+        .filter(model.user.User.username == user_name)
+        .update(
+            {
+                "name": datos_actualizar.name,
+                "cargo": datos_actualizar.cargo,
+                "user_password": datos_actualizar.user_password,
+            }
+        )
+    )
 
     if act is None:
         raise HTTPException(HTTP_404_NOT_FOUND, detail="No hay usuario por actualizar")
@@ -106,3 +109,28 @@ async def borrar(user_name: str, db: db_dependecy):
     db.delete(busca)
     db.commit()
     return Response(status_code=HTTP_200_OK)
+
+
+@usr.post("/usr/login", tags=["Login"], status_code=HTTP_202_ACCEPTED)
+async def login(username:Annotated[str, Form()], user_password:Annotated[str, Form()], db: db_dependecy, request: Request):
+    
+    log_s = (
+        db.query(model.user.User)
+        .filter(model.user.User.username == username)
+        .first()
+    )
+
+    if log_s != None and log_s.username == "admin":
+        contra = check_password_hash(log_s.user_password, user_password)
+        if contra:
+            return admintem.TemplateResponse("admin.html", {"request": request})
+        raise HTTPException(HTTP_404_NOT_FOUND, detail="Acceso denegado")
+    if log_s != None:
+        contra = check_password_hash(log_s.user_password, user_password)
+        if contra:
+            return HTMLResponse(
+                content="<p>Usuario Normal</p>",
+                status_code=HTTP_202_ACCEPTED,
+            )
+        raise HTTPException(HTTP_404_NOT_FOUND, detail="Acceso denegado")
+    
