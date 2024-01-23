@@ -50,15 +50,13 @@ async def Create(user_data: UserSchema, db: db_dependecy):
 
 #!Buscar un usuario por username
 @usr.get("/usr/buser", tags=["busqueda de usuario"], status_code=HTTP_200_OK)
-async def buser(user_name: str, db: db_dependecy):
+async def buser(user_name: str, db: db_dependecy, request:Request):
     userb = (
         db.query(model.user.User).filter(model.user.User.username == user_name).first()
     )  # Filtramos la busqueda por username
 
     if userb is None:
-        raise HTTPException(
-            status_code=HTTP_404_NOT_FOUND, detail="Usuario no encontrado"
-        )
+        raise admintem.TemplateResponse("404.html", {"request": request})
     return userb
 
 
@@ -114,23 +112,15 @@ async def borrar(user_name: str, db: db_dependecy):
 @usr.post("/usr/login", tags=["Login"], status_code=HTTP_202_ACCEPTED)
 async def login(username:Annotated[str, Form()], user_password:Annotated[str, Form()], db: db_dependecy, request: Request):
     
-    log_s = (
-        db.query(model.user.User)
-        .filter(model.user.User.username == username)
-        .first()
-    )
-
+    log_s = db.query(model.user.User).filter(model.user.User.username == username).first()
+    
     if log_s != None and log_s.username == "admin":
         contra = check_password_hash(log_s.user_password, user_password)
         if contra:
             return admintem.TemplateResponse("admin.html", {"request": request})
-        raise HTTPException(HTTP_404_NOT_FOUND, detail="Acceso denegado")
     if log_s != None:
         contra = check_password_hash(log_s.user_password, user_password)
         if contra:
-            return HTMLResponse(
-                content="<p>Usuario Normal</p>",
-                status_code=HTTP_202_ACCEPTED,
-            )
-        raise HTTPException(HTTP_404_NOT_FOUND, detail="Acceso denegado")
+            return admintem.TemplateResponse("docform.html", {"request": request})
+    return admintem.TemplateResponse("index.html", {"request": request})
     

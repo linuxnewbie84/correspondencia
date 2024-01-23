@@ -9,7 +9,7 @@ from fastapi.templating import Jinja2Templates
 from typing import Annotated
 
 doct = APIRouter()
-doctem = Jinja2Templates(directory="templates")
+
 
 
 def get_db():
@@ -21,9 +21,6 @@ def get_db():
         
 db_dependecy  = Annotated[Session, Depends(get_db)]
         
-@doct.get("/doc", tags=["Alta de Correspondencia"],status_code=HTTP_200_OK, response_class=HTMLResponse)
-async def wdoc(request:Request):
-    return doctem.TemplateResponse("docform.html", {"request":request})
 
 @doct.post("/doc", tags=["Crear Documento"], status_code=HTTP_201_CREATED)
 async def created(doc:Doc_Schema, db:db_dependecy):
