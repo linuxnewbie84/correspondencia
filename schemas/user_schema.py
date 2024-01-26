@@ -1,3 +1,4 @@
+from fastapi import Form
 from pydantic import BaseModel, Field
 from typing import Optional
 from werkzeug.security import generate_password_hash, check_password_hash

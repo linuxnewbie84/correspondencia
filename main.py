@@ -10,6 +10,7 @@ from model import user, doc
 from config.db import engine, Base
 from router.usuarios import usr
 from router.doc import doct
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 app.title="Servicio de Correspondencia"

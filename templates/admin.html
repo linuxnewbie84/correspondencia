@@ -1,11 +1,79 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    
-</body>
-</html>
+{% extends 'base.html' %}
+
+{% block content %}
+  <div style="text-align: right">
+    <a href="/" class="btn btn-secondary">Salir</a>
+  </div>
+  <div style="text-align: center">
+    <img class="mb-4" src="/static/img/jaguar.png" alt="" width="150" height="150" />
+    <h1 class="h3 mb-3 fw-normal">Administración de Usarios</h1>
+  </div>
+  <div class="row">
+    <div class="col-md-auto">
+      <button type="button" class="btn btn-primary" id="btn-add">Add New</button>
+      <br /><br />
+      <div style="text-align: center">
+        <table class="table table-bordered table-striped">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Nombre</th>
+              <th>Cargo</th>
+              <th>Usuario</th>
+              <th>Contraseña</th>
+              <th width="100">Herramientas</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for rs in todos %}
+              <tr>
+                <td>{{ rs.id }}</td>
+                <td>{{ rs.name }}</td>
+                <td>{{ rs.cargo }}</td>
+                <td>{{ rs.username }}</td>
+                <td>{{ rs.user_password }}</td>
+
+                <td>
+                  <a href="edit/{{ rs.id }}" class="btn btn-success">Editar</a> <a href="delete/{{ rs.id }}" class="btn btn-danger">Borrar</a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="modal" tabindex="-1" id="myModal">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Modal title</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <p>Modal body text goes here.</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" id="btn-save">Save changes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+{% block scripts %}
+  <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+  <script>
+    $(document).ready(function(){
+      $("#btn-add").click(function(){
+        $("#myModal").modal('show')
+      })
+
+      $("#btn-save").click(function(){
+        alert(1)
+        console.log('1')
+      });
+    });
+  </script>
+{% endblock %}

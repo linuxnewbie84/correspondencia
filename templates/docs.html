@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block content%}
+
+<div style="text-align: right">
+  <a href="/" class=" btn btn-secondary">Salir</a>
+</div>
+<div style = "text-align: center">
+    <img class="mb-4" src="/static/img/jaguar.png" alt="" width="150" height="150">
+    <h1 class="h3 mb-3 fw-normal">Documentos Registrados</h1>
+  </div>   
+<div class="row">
+    <div class="col-md-auto">
+        <a href="addnew/" class="btn btn-primary">Add New</a>
+        <br><br>
+        <div style = "text-align: center">
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Numero de Oficio</th>
+                    <th>Asunto</th>
+                    <th>Remitente</th>
+                    <th>Turnado</th>
+                    <th>Respuesta</th>
+                    <th>Fecha de Emisión</th>
+                    <th>URL</th>
+                    <th width="200">Herramientas</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for rs in docs %}
+                    <tr>
+                        <td>{{ rs.fecha }}</td>
+                        <td>{{ rs.numoficio}}</td>
+                        <td>{{ rs.asunto}}</td>
+                        <td>{{ rs.remitente }}</td>
+                        <td>{{ rs.turn}}</td>
+                        <td>{{ rs.resp }}</td>
+                         <td>{{ rs.femi }}</td>
+                         <td>{{ rs.url }}</td>
+                        <td>
+                            <a href="edit/{{ rs.id }}" class="btn btn-success">Editar</a>    <a href="delete/{{ rs.id }}" class="btn btn-danger">Borrar</a>  
+                        </td>
+                    </tr>
+                {% endfor %}    
+            </tbody>
+        </table>
+      </div> 
+    </div>
+</div>
+
+{% endblock content %}
