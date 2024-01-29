@@ -15,3 +15,4 @@ class Doc(Base):
     resp = Column(String(250), nullable=False)
     femi = Column(Date, nullable=False)
     url = Column(Text)
+    urlresp = Column(Text)

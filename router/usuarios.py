@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Request, Form, Depends, HTTPException, Response
-from schemas.user_schema import UserSchema
+from schemas.user_schema import UserSchema, Id_User, CrearUsuario
 from starlette.status import (
     HTTP_201_CREATED,
     HTTP_200_OK,
@@ -14,6 +14,7 @@ from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 from typing import Annotated
 from werkzeug.security import check_password_hash
+import crud
 
 
 usr = APIRouter()
@@ -34,15 +35,9 @@ db_dependecy = Annotated[Session, Depends(get_db)]  # Necesaria para todas las c
 
 
 #!Crear usuarios
-@usr.post("/usr/crear/",tags=["Crear Usuario"], status_code=HTTP_201_CREATED)
-async def Create(user_data: UserSchema, db: db_dependecy):
-    user_data.set_password(
-        user_data.user_password
-    )  # Hasheamos el password antes de guardar
-    new_user = model.user.User(**user_data.model_dump())  # Creamos un directorio
-    db.add(new_user)  # Agregamos a la base en la tabla usuarios
-    db.commit()
-    return Response(status_code=HTTP_201_CREATED)
+@usr.post("/usr/crear/",tags=["Crear Usuario"], status_code=HTTP_201_CREATED, response_model=Id_User)
+async def Create(user: CrearUsuario, db: db_dependecy):
+    return crud.crear(db=db, user=user)
 
 
 #!Buscar un usuario por username
@@ -71,7 +66,7 @@ async def mostrar(db: db_dependecy):
 #! Modificar Usuario
 
 
-@usr.put("/usr/modificar/", tags=["Modificar Usuario"], status_code=HTTP_200_OK)
+@usr.put("/usr/modificar/{id}", tags=["Modificar Usuario"], status_code=HTTP_200_OK, response_model=Id_User)
 async def update(id: int, datos_actualizar: UserSchema, db: db_dependecy):
     datos_actualizar.set_password(datos_actualizar.user_password)
     act = (db.query(model.user.User).filter(model.user.User.id == id).update(
@@ -108,9 +103,8 @@ async def login(username: Annotated[str, Form()],user_password: Annotated[str, F
     log_s = (
         db.query(model.user.User).filter(model.user.User.username == username).first()
     )
-    todos = db.query(model.user.User).all()
-    docs = db.query(model.doc.Doc).all()
-
+    todos = db.query(model.user.User).order_by(model.user.User.id.desc())
+    docs = db.query(model.doc.Doc).order_by(model.doc.Doc.id.desc())
     if log_s != None and username == "admin":
         contra = check_password_hash(log_s.user_password, user_password)
         if contra:
