@@ -34,11 +34,7 @@ db_dependecy = Annotated[Session, Depends(get_db)]  # Necesaria para todas las c
 
 
 #!Crear usuarios
-@usr.post(
-    "/user/{codigo}",
-    tags=["Crear Usuario"],
-    status_code=HTTP_201_CREATED,
-)
+@usr.post("/usr/crear/",tags=["Crear Usuario"], status_code=HTTP_201_CREATED)
 async def Create(user_data: UserSchema, db: db_dependecy):
     user_data.set_password(
         user_data.user_password
@@ -62,12 +58,7 @@ async def buser(user_name: Annotated[str, Form()], db: db_dependecy, request: Re
 
 
 #! Mostrar usuarios
-@usr.get(
-    "/usr/todos",
-    tags=["Mostrar usuarios"],
-    status_code=HTTP_200_OK,
-    response_model=list[UserSchema],
-)
+@usr.get("/usr/todos",tags=["Mostrar usuarios"],status_code=HTTP_200_OK,response_model=list[UserSchema])
 async def mostrar(db: db_dependecy):
     todos = db.query(model.user.User).order_by(model.user.User.id.desc())
     if todos is None:
@@ -81,12 +72,9 @@ async def mostrar(db: db_dependecy):
 
 
 @usr.put("/usr/modificar/", tags=["Modificar Usuario"], status_code=HTTP_200_OK)
-async def update(user_name: str, datos_actualizar: UserSchema, db: db_dependecy):
+async def update(id: int, datos_actualizar: UserSchema, db: db_dependecy):
     datos_actualizar.set_password(datos_actualizar.user_password)
-    act = (
-        db.query(model.user.User)
-        .filter(model.user.User.username == user_name)
-        .update(
+    act = (db.query(model.user.User).filter(model.user.User.id == id).update(
             {
                 "name": datos_actualizar.name,
                 "cargo": datos_actualizar.cargo,
@@ -115,17 +103,8 @@ async def borrar(user_name: Annotated[str, Form()], db: db_dependecy):
     return Response(status_code=HTTP_200_OK)
 
 
-@usr.post(
-    "/usr/login",
-    tags=["Login"],
-    status_code=HTTP_202_ACCEPTED,
-)
-async def login(
-    username: Annotated[str, Form()],
-    user_password: Annotated[str, Form()],
-    db: db_dependecy,
-    request: Request,
-):  # , db: db_dependecy, request: Request)
+@usr.post("/usr/login",tags=["Login"], status_code=HTTP_202_ACCEPTED)
+async def login(username: Annotated[str, Form()],user_password: Annotated[str, Form()],db: db_dependecy, request: Request):  # , db: db_dependecy, request: Request)
     log_s = (
         db.query(model.user.User).filter(model.user.User.username == username).first()
     )
