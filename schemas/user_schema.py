@@ -20,3 +20,7 @@ class CrearUsuario(UserSchema):
 
 class Id_User(UserSchema):
     id: int
+    
+    class config():
+        orm_mode = True
+            

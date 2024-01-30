@@ -1,7 +1,9 @@
 import uvicorn
 import os
 from fastapi import FastAPI
-from fastapi.staticfiles import StaticFiles # Necesaria para poder utilizar las images y estilos
+from fastapi.staticfiles import (
+    StaticFiles,
+)  # Necesaria para poder utilizar las images y estilos
 from router import usuarios
 from fastapi import Request
 from fastapi.templating import Jinja2Templates
@@ -24,10 +26,10 @@ template = Jinja2Templates(directory="templates")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_credentials=True,
     allow_origins=["*"],
     allow_methods=["*"],
     allow_headers=["*"],
+    allow_credentials=True
 )
 
 user.Base.metadata.create_all(bind=engine)  #!Creamos las tablas desde los modelos

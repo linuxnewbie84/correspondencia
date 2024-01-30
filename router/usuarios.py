@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Request, Form, Depends, HTTPException, Response
+from typing import List
 from schemas.user_schema import UserSchema, Id_User, CrearUsuario
 from starlette.status import (
     HTTP_201_CREATED,
@@ -35,7 +36,12 @@ db_dependecy = Annotated[Session, Depends(get_db)]  # Necesaria para todas las c
 
 
 #!Crear usuarios
-@usr.post("/usr/crear/",tags=["Crear Usuario"], status_code=HTTP_201_CREATED, response_model=Id_User)
+@usr.post(
+    "/usr/crear/",
+    tags=["Crear Usuario"],
+    status_code=HTTP_201_CREATED,
+    response_model=Id_User,
+)
 async def Create(user: CrearUsuario, db: db_dependecy):
     return crud.crear(db=db, user=user)
 
@@ -53,7 +59,12 @@ async def buser(user_name: Annotated[str, Form()], db: db_dependecy, request: Re
 
 
 #! Mostrar usuarios
-@usr.get("/usr/todos",tags=["Mostrar usuarios"],status_code=HTTP_200_OK,response_model=list[UserSchema])
+@usr.get(
+    "/usr/todos",
+    tags=["Mostrar usuarios"],
+    status_code=HTTP_200_OK,
+    response_model=List[UserSchema],
+)
 async def mostrar(db: db_dependecy):
     todos = db.query(model.user.User).order_by(model.user.User.id.desc())
     if todos is None:
@@ -66,21 +77,15 @@ async def mostrar(db: db_dependecy):
 #! Modificar Usuario
 
 
-@usr.put("/usr/modificar/{id}", tags=["Modificar Usuario"], status_code=HTTP_200_OK, response_model=Id_User)
-async def update(id: int, datos_actualizar: UserSchema, db: db_dependecy):
+@usr.put("/usr/modificar/{idusr}", tags=["Modificar Usuario"], status_code=HTTP_200_OK)
+async def update(idusr:int, datos_actualizar:UserSchema, db:db_dependecy):
     datos_actualizar.set_password(datos_actualizar.user_password)
-    act = (db.query(model.user.User).filter(model.user.User.id == id).update(
-            {
-                "name": datos_actualizar.name,
-                "cargo": datos_actualizar.cargo,
-                "user_password": datos_actualizar.user_password,
-            }
-        )
-    )
-
-    if act is None:
-        raise HTTPException(HTTP_404_NOT_FOUND, detail="No hay usuario por actualizar")
+    userac = db.query(model.user.User).filter(model.user.User.id==idusr).update({"name":datos_actualizar.name,"cargo":datos_actualizar.cargo, "username":datos_actualizar.username, "user_password": datos_actualizar.user_password,
+     })
+    if userac  ==  None:
+        raise HTTPException(status_code= HTTP_404_NOT_FOUND, detail="No Existe el Usuario")
     db.commit()
+         
 
 
 # ? Borrar usuario
@@ -98,8 +103,13 @@ async def borrar(user_name: Annotated[str, Form()], db: db_dependecy):
     return Response(status_code=HTTP_200_OK)
 
 
-@usr.post("/usr/login",tags=["Login"], status_code=HTTP_202_ACCEPTED)
-async def login(username: Annotated[str, Form()],user_password: Annotated[str, Form()],db: db_dependecy, request: Request):  # , db: db_dependecy, request: Request)
+@usr.post("/usr/login", tags=["Login"], status_code=HTTP_202_ACCEPTED)
+async def login(
+    username: Annotated[str, Form()],
+    user_password: Annotated[str, Form()],
+    db: db_dependecy,
+    request: Request,
+):  # , db: db_dependecy, request: Request)
     log_s = (
         db.query(model.user.User).filter(model.user.User.username == username).first()
     )
@@ -116,5 +126,7 @@ async def login(username: Annotated[str, Form()],user_password: Annotated[str, F
     if log_s != None:
         contra = check_password_hash(log_s.user_password, user_password)
         if contra:
-            return admintem.TemplateResponse("docs.html", {"request": request, "docs":docs})
+            return admintem.TemplateResponse(
+                "docs.html", {"request": request, "docs": docs}
+            )
     return admintem.TemplateResponse("index.html", {"request": request})

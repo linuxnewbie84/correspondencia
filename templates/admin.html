@@ -50,7 +50,7 @@
         <h4 class="modal-title w-100 font-weight-bold">Nuevo Usuario</h4>
         <button type="button" class="btn-close" data-dismiss="modal" aria-hidden="true">x</button>
       </div>
-      <form id ="crear" action="/usr/crear/" name ="crear">
+      <form id ="fcrear" action="/usr/crear/" name ="crear" method="post">
       <div class="modal-body mx-3">
         <div class="md-form mb-5">
           <i class="fas fa-user prefix grey-text"></i>
@@ -60,14 +60,14 @@
 
         <div class="md-form mb-5">
           <i class="fas fa-envelope prefix grey-text"></i>
-          <input type="text" id="username" class="form-control validate">
-          <label data-error="wrong" data-success="right" for="username">Usuario</label>
+          <input type="text" id="cargo" class="form-control validate">
+          <label data-error="wrong" data-success="right" for="cargo">Cargo</label>
         </div>
 
         <div class="md-form mb-5">
           <i class="fas fa-envelope prefix grey-text"></i>
-          <input type="text" id="cargo" class="form-control validate">
-          <label data-error="wrong" data-success="right" for="cargo">Cargo</label>
+          <input type="text" id="username" class="form-control validate">
+          <label data-error="wrong" data-success="right" for="username">Usuario</label>
         </div>
 
         <div class="md-form mb-5">
@@ -78,7 +78,7 @@
 
       </div>
       <div class="modal-footer d-flex justify-content-center">
-        <button type="submit" class="btn btn-unique">Crear<i class="fas fa-paper-plane-o ml-1"></i></button>
+        <button type="button" id="crear" class="btn btn-unique">Crear<i class="fas fa-paper-plane-o ml-1"></i></button>
       </div>
     </div>
   </form>
@@ -86,7 +86,6 @@
 </div>
 {% endblock %}
 {% block scripts %}
-  <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
   <script> 
     $(document).ready(function(){
       $("#btn-add").click(function(){
@@ -94,12 +93,30 @@
         alert("Crearás un nuevo Usuario")
       });
 
-      $('#crear').submit(function(){
-          $.ajax({
-            type:"POST"
-            
-          })
-      })
+      $("#crear").click(function(){
+        
+         var name = $("#name").val();
+         var cargo =$("#cargo").val();
+         var username =$("#username").val();
+         var user_password =$("#user_password").val(); 
+         
+         $.ajax({
+                url: "/usr/crear/",
+                method: "POST",
+                dataType: "json",
+                data: {
+                  'name': name,
+                  'cargo': cargo,
+                  'username':username,
+                  'user_password': user_password,
+    
+                },
+                success: function(data){
+                    alert("Successfully submitted.");
+                }
+            });
+        
+    });
 
       $("#btn-save").click(function(){
         alert(1)
