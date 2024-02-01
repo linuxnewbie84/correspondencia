@@ -5,8 +5,8 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 
 class UserSchema(BaseModel):
-    name: str = Field(min_length=8, max_length=250)
-    cargo: str = Field(min_length=8, max_length=250)
+    name: str = Field(min_length=4, max_length=250)
+    cargo: str = Field(min_length=4, max_length=250)
     username: str = Field(min_length=4, max_length=50)
     user_password: str
 

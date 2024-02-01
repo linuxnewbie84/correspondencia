@@ -14,7 +14,7 @@ from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 from typing import Annotated
-from werkzeug.security import check_password_hash
+from werkzeug.security import check_password_hash, generate_password_hash
 import crud
 
 
@@ -40,10 +40,20 @@ db_dependecy = Annotated[Session, Depends(get_db)]  # Necesaria para todas las c
     "/usr/crear/",
     tags=["Crear Usuario"],
     status_code=HTTP_201_CREATED,
-    response_model=Id_User,
 )
-async def Create(user: CrearUsuario, db: db_dependecy):
-    return crud.crear(db=db, user=user)
+async def Create(
+    name: Annotated[str, Form()],
+    cargo: Annotated[str, Form()],
+    username: Annotated[str, Form()],
+    user_password: Annotated[str, Form()],
+    db: db_dependecy,
+):
+    user_password = generate_password_hash(user_password, "pbkdf2:sha256:30", 30)
+    new_user = model.user.User(
+        name=name, cargo=cargo, username=username, user_password=user_password
+    )
+    db.add(new_user)
+    db.commit()
 
 
 #!Buscar un usuario por username
@@ -77,15 +87,29 @@ async def mostrar(db: db_dependecy):
 #! Modificar Usuario
 
 
-@usr.put("/usr/modificar/{idusr}", tags=["Modificar Usuario"], status_code=HTTP_200_OK)
-async def update(idusr:int, datos_actualizar:UserSchema, db:db_dependecy):
-    datos_actualizar.set_password(datos_actualizar.user_password)
-    userac = db.query(model.user.User).filter(model.user.User.id==idusr).update({"name":datos_actualizar.name,"cargo":datos_actualizar.cargo, "username":datos_actualizar.username, "user_password": datos_actualizar.user_password,
-     })
-    if userac  ==  None:
-        raise HTTPException(status_code= HTTP_404_NOT_FOUND, detail="No Existe el Usuario")
+@usr.put("/usr/modificar/", tags=["Modificar Usuario"], status_code=HTTP_200_OK)
+async def update(
+    id: Annotated[int, Form()],
+    name: Annotated[str, Form()],
+    cargo: Annotated[str, Form()],
+    username: Annotated[str, Form()],
+    user_password: Annotated[str, Form()],
+    db: db_dependecy,
+):
+    user_password = generate_password_hash(user_password, "pbkdf2:sha256:30", 30)
+    user_actulizar = (
+        db.query(model.user.User)
+        .filter(model.user.User.id == id)
+        .update(
+            {
+                "name": name,
+                "cargo": cargo,
+                "username": username,
+                "user_password": user_password,
+            }
+        )
+    )
     db.commit()
-         
 
 
 # ? Borrar usuario
