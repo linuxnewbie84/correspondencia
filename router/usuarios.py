@@ -34,10 +34,19 @@ def get_db():
 
 db_dependecy = Annotated[Session, Depends(get_db)]  # Necesaria para todas las consultas
 
+@usr.get("/usr/tables")
+def tables(request: Request):
+    return admintem.TemplateResponse("tables.html", {"request": request})
+
+
+@usr.get("/usr/admin")
+def tables(request: Request):
+    return admintem.TemplateResponse("admin.html", {"request": request})
+
 
 #!Crear usuarios
 @usr.post(
-    "/usr/crear/",
+    "/usr/create/",
     tags=["Crear Usuario"],
     status_code=HTTP_201_CREATED,
 )
@@ -87,7 +96,7 @@ async def mostrar(db: db_dependecy):
 #! Modificar Usuario
 
 
-@usr.put("/usr/modificar/", tags=["Modificar Usuario"], status_code=HTTP_200_OK)
+@usr.put("/usr/modificar/{{id}}", tags=["Modificar Usuario"], status_code=HTTP_200_OK)
 async def update(
     id: Annotated[int, Form()],
     name: Annotated[str, Form()],
@@ -113,10 +122,10 @@ async def update(
 
 
 # ? Borrar usuario
-@usr.delete("/usr/borrar", tags=["Borrar usuarios"], status_code=HTTP_200_OK)
-async def borrar(user_name: Annotated[str, Form()], db: db_dependecy):
+@usr.delete("/usr/borrar{{id}}", tags=["Borrar usuarios"], status_code=HTTP_200_OK)
+async def borrar(id: Annotated[int, Form()], db: db_dependecy):
     busca = (
-        db.query(model.user.User).filter(model.user.User.username == user_name).first()
+        db.query(model.user.User).filter(model.user.User.id == id).first()
     )
     if busca is None:
         raise HTTPException(
