@@ -82,13 +82,14 @@
 
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                    <button type="submit" form="myForm" class="btn btn-primary submit">Crear</button>
+                    <button type="submit" class="btn btn-primary submit">Crear</button>
                 </div>
             </div>
         </div>
     </div>
 {% block script %}
 
+<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
 <script>
   $ $(document).ready(function () {
       $('#userForm').click(function () {
@@ -96,7 +97,7 @@
         alert('Crearás un nuevo Usuario')
       })
     
-      $('#myForm').click(function () {
+      $('#myForm').submit(function () {
         var name = $('#name').val()
         var cargo = $('#cargo').val()
         var username = $('#username').val()
