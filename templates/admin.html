@@ -28,7 +28,7 @@
                 <td>{{ users.cargo }}</td>
                 <td>{{ users.username }}</td>
                 <td>
-                  <a href="/usr/{{ users.id }}" class="btn btn-success">Editar</a> <a href="delete/{{ users.id }}" class="btn btn-danger">Borrar</a>
+                  <a href="/usr/{{ users.id }}" class="btn btn-success">Editar</a> <a href="/usr/borrar/{{ users.id }}" class="btn btn-danger">Borrar</a>
                 </td>
               </tr>
             {% endfor %}
@@ -98,11 +98,9 @@
         var username = $('#username').val()
         var user_password = $('#user_password').val()
 
-        alert(name)
+        alert("Está Por Crear un nuevo Usuario", name)
 
         if (form.valid()) {
-            alert(name)
-            alert(user_password)
         $.ajax({
           url: "/usr/create/",
           type: 'POST',

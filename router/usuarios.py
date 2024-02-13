@@ -34,11 +34,8 @@ def get_db():
 
 db_dependecy = Annotated[Session, Depends(get_db)]  # Necesaria para todas las consultas
 
-@usr.get("/usr/tables")
-def tables(request: Request):
-    return admintem.TemplateResponse("tables.html", {"request": request})
 
-
+#!retonamos la tabla
 @usr.get("/admin")
 def admin(request: Request, db:db_dependecy):
     todos = db.query(model.user.User).order_by(model.user.User.id.desc())
@@ -80,22 +77,6 @@ async def buser(user_id:int, db: db_dependecy, request: Request):
     return admintem.TemplateResponse("edit.html", {"request": request, "user":userb})
 
 
-#! Mostrar usuarios
-@usr.get(
-    "/usr/todos",
-    tags=["Mostrar usuarios"],
-    status_code=HTTP_200_OK,
-    response_model=List[UserSchema],
-)
-async def mostrar(db: db_dependecy):
-    todos = db.query(model.user.User).order_by(model.user.User.id.desc())
-    if todos is None:
-        raise HTTPException(
-            status_code=HTTP_404_NOT_FOUND, detail="No hay Usuarios que mostrar"
-        )
-    return todos
-
-
 #! Modificar Usuario
 
 
@@ -126,18 +107,13 @@ async def update(id:int,
 
 
 # ? Borrar usuario
-@usr.delete("/usr/borrar{{id}}", tags=["Borrar usuarios"], status_code=HTTP_200_OK)
-async def borrar(id: Annotated[int, Form()], db: db_dependecy):
-    busca = (
-        db.query(model.user.User).filter(model.user.User.id == id).first()
-    )
-    if busca is None:
-        raise HTTPException(
-            status_code=HTTP_404_NOT_FOUND, detail="No Existe el usuario"
-        )
+@usr.get("/usr/borrar/{id}", tags=["Borrar usuarios"], status_code=HTTP_200_OK)
+async def borrar(id:int,db: db_dependecy, request:Request):
+    busca = db.query(model.user.User).filter(model.user.User.id == id).first()
     db.delete(busca)
     db.commit()
-    return Response(status_code=HTTP_200_OK)
+    url = usr.url_path_for("admin")
+    return RedirectResponse(url=url, status_code=303)
 
 
 @usr.post("/usr/login", tags=["Login"], status_code=HTTP_202_ACCEPTED, response_class=RedirectResponse)
