@@ -1,0 +1,24 @@
+{% extends "base2.html" %}
+{% block content %}
+    <form action="/usr/modificar/{{user.id}}" method="post">
+        <div class="mb-3">
+            <label>Name</label>
+            <input type = "text" name = "name" placeholder = "Name" class="form-control" value="{{user.name}}"/>
+        </div> 
+        <div class="mb-3">
+            <label>Cargo</label>
+            <input type = "text" name = "cargo" placeholder = "cargo" class="form-control" value="{{user.cargo}}"/>
+        </div> 
+        <div class="mb-3">
+            <label>UserName</label>
+            <input type = "text" name = "username" placeholder = "username" class="form-control" value="{{user.username}}"/>
+        </div> 
+
+        <div class="mb-3">
+            <label>Password</label>
+            <input type = "password" name = "user_password" placeholder = "paswword" class="form-control" value="{{user.user_password}}"/>
+        </div> 
+     
+        <input type = "submit" value = "Update" class="btn btn-primary mb-3"/>  
+     </form> 
+{% endblock content %}

@@ -39,9 +39,10 @@ def tables(request: Request):
     return admintem.TemplateResponse("tables.html", {"request": request})
 
 
-@usr.get("/usr/admin")
-def tables(request: Request):
-    return admintem.TemplateResponse("admin.html", {"request": request})
+@usr.get("/admin")
+def admin(request: Request, db:db_dependecy):
+    todos = db.query(model.user.User).order_by(model.user.User.id.desc())
+    return admintem.TemplateResponse("admin.html", {"request": request, "todos":todos})
 
 
 #!Crear usuarios
@@ -61,20 +62,22 @@ async def Create(
     new_user = model.user.User(
         name=name, cargo=cargo, username=username, user_password=user_password
     )
+    
     db.add(new_user)
     db.commit()
+    return JSONResponse(status_code=HTTP_201_CREATED, content="Success")
 
 
-#!Buscar un usuario por username
-@usr.get("/usr/buser/", tags=["busqueda de usuario"], status_code=HTTP_200_OK)
-async def buser(user_name: Annotated[str, Form()], db: db_dependecy, request: Request):
+#!Buscar un usuario por id y mostrar en el formulario
+@usr.get("/usr/{user_id}", tags=["busqueda de usuario"], status_code=HTTP_200_OK)
+async def buser(user_id:int, db: db_dependecy, request: Request):
     userb = (
-        db.query(model.user.User).filter(model.user.User.username == user_name).first()
+        db.query(model.user.User).filter(model.user.User.id == user_id).first()
     )  # Filtramos la busqueda por username
 
     if userb is None:
         raise admintem.TemplateResponse("404.html", {"request": request})
-    return userb
+    return admintem.TemplateResponse("edit.html", {"request": request, "user":userb})
 
 
 #! Mostrar usuarios
@@ -96,14 +99,13 @@ async def mostrar(db: db_dependecy):
 #! Modificar Usuario
 
 
-@usr.put("/usr/modificar/{{id}}", tags=["Modificar Usuario"], status_code=HTTP_200_OK)
-async def update(
-    id: Annotated[int, Form()],
+@usr.post("/usr/modificar/{id}", tags=["Modificar Usuario"], status_code=HTTP_200_OK)
+async def update(id:int,
     name: Annotated[str, Form()],
     cargo: Annotated[str, Form()],
     username: Annotated[str, Form()],
     user_password: Annotated[str, Form()],
-    db: db_dependecy,
+    db: db_dependecy, request:Request
 ):
     user_password = generate_password_hash(user_password, "pbkdf2:sha256:30", 30)
     user_actulizar = (
@@ -119,6 +121,8 @@ async def update(
         )
     )
     db.commit()
+    url = usr.url_path_for("admin")
+    return RedirectResponse(url=url, status_code=303)
 
 
 # ? Borrar usuario
@@ -136,7 +140,7 @@ async def borrar(id: Annotated[int, Form()], db: db_dependecy):
     return Response(status_code=HTTP_200_OK)
 
 
-@usr.post("/usr/login", tags=["Login"], status_code=HTTP_202_ACCEPTED)
+@usr.post("/usr/login", tags=["Login"], status_code=HTTP_202_ACCEPTED, response_class=RedirectResponse)
 async def login(
     username: Annotated[str, Form()],
     user_password: Annotated[str, Form()],
@@ -146,14 +150,13 @@ async def login(
     log_s = (
         db.query(model.user.User).filter(model.user.User.username == username).first()
     )
-    todos = db.query(model.user.User).order_by(model.user.User.id.desc())
+    
     docs = db.query(model.doc.Doc).order_by(model.doc.Doc.id.desc())
     if log_s != None and username == "admin":
         contra = check_password_hash(log_s.user_password, user_password)
         if contra:
-            return admintem.TemplateResponse(
-                "admin.html", {"request": request, "todos": todos}
-            )
+            url = usr.url_path_for("admin")
+            return RedirectResponse(url = url, status_code=303)
         else:
             return admintem.TemplateResponse("index.html", {"request": request})
     if log_s != None:

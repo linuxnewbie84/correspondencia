@@ -27,9 +27,9 @@ template = Jinja2Templates(directory="templates")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
-    allow_credentials=True
 )
 
 user.Base.metadata.create_all(bind=engine)  #!Creamos las tablas desde los modelos
