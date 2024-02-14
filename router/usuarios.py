@@ -16,6 +16,7 @@ from sqlalchemy.orm import Session
 from typing import Annotated
 from werkzeug.security import check_password_hash, generate_password_hash
 import crud
+from router import doc
 
 
 usr = APIRouter()
@@ -126,8 +127,7 @@ async def login(
     log_s = (
         db.query(model.user.User).filter(model.user.User.username == username).first()
     )
-    
-    docs = db.query(model.doc.Doc).order_by(model.doc.Doc.id.desc())
+
     if log_s != None and username == "admin":
         contra = check_password_hash(log_s.user_password, user_password)
         if contra:
@@ -138,7 +138,5 @@ async def login(
     if log_s != None:
         contra = check_password_hash(log_s.user_password, user_password)
         if contra:
-            return admintem.TemplateResponse(
-                "docs.html", {"request": request, "docs": docs}
-            )
+            return RedirectResponse(url="/doc", status_code=303)
     return admintem.TemplateResponse("index.html", {"request": request})
