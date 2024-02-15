@@ -1,66 +1,144 @@
-{% extends 'base.html' %}
-
+{% extends 'base2.html' %}
 {% block content %}
-<div style="text-align: right">
-    <a href="/" class=" btn btn-secondary">Salir</a>
-</div>
-<div style = "text-align: center">
-    <img class="mb-4" src="/static/img/jaguar.png" alt="" width="150" height="150">
-    <h1 class="h3 mb-3 fw-normal">Documentos Registrados</h1>
-</div>   
+  <section class="p-3">
     <div class="row">
-        <div class="col-md-auto">
-        <a href="addnew/" class="btn btn-primary">Add New</a>
-        <br><br>
-        <div style = "text-align: center">
-            <table id="datatable" class="display" style="width:100%">
-            <thead>
-                <tr>
-                    <th>Fecha</th>
-                    <th>Numero de Oficio</th>
-                    <th>Asunto</th>
-                    <th>Remitente</th>
-                    <th>Turnado</th>
-                    <th>Respuesta</th>
-                    <th>Fecha de Emisión</th>
-                    <th>URL</th>
-                    <th>URL Respuesta</th>
-                    <th width="100">Herramientas</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for rs in docs %}
-                    <tr>
-                        <td>{{ rs.fecha }}</td>
-                        <td>{{ rs.numoficio}}</td>
-                        <td>{{ rs.asunto}}</td>
-                        <td>{{ rs.remitente }}</td>
-                        <td>{{ rs.turn}}</td>
-                        <td>{{ rs.resp }}</td>
-                         <td>{{ rs.femi }}</td>
-                         <td>{{ rs.url }}</td>
-                         <td>{{rs.urlresp}}</td>
-                        <td>
-                            <a href="edit/{{ rs.id }}" class="btn btn-success">Editar</a>    <a href="delete/{{ rs.id }}" class="btn btn-danger">Borrar</a>  
-                        </td>
-                    </tr>
-                {% endfor %}    
-            </tbody>
-        </table>
-      </div> 
+      <div class="col-12">
+        <button class="btn btn-primary newUser" data-bs-toggle="modal" data-bs-target="#userForm">Nuevo Documento<i class="bi bi-people"></i></button>
+      </div>
     </div>
-</div>
-{% endblock content %}
-{% block scripts%}
-<script src="https://cdn.datatables.net/v/dt/dt-1.13.8/datatables.min.js"></script>
-<script>
-    new DataTable('#datatable', {
-    columnDefs: [
-        {
-            targets: 4,
-            render: DataTable.render.datetime('Do MMM YYYY')
-        }
-    ]
-});
-</script>
-{% endblock%}
+
+    <div class="row">
+      <div class="col-12">
+        <table id="documents" class="table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Fecha</th>
+              <th>Num.Oficio</th>
+              <th>Asunto</th>
+              <th>Remitente</th>
+              <th>Turno</th>
+              <th>Respuesta</th>
+              <th>Fecha de Emisión</th>
+              <th>Herramientas</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {% for docs in documents %}
+              <tr>
+                <td>{{ docs.id }}</td>
+                <td>{{ docs.fecha }}</td>
+                <td>{{ docs.numoficio }}</td>
+                <td>{{ docs.asunto }}</td>
+                <td>{{ docs.remitente }}</td>
+                <td>{{ docs.turn }}</td>
+                <td>{{ docs.resp }}</td>
+                <td>{{ docs.femi }}</td>
+                <td>
+                  <a href="/doc/{{ docs.id }}" class="btn btn-success">Editar</a> <a href="/usr/borrar/{{ docs.id }}" class="btn btn-danger">Borrar</a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- Modal Form -->
+  <div class="modal fade" id="userForm">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Nuevo Documento</h4>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+
+        <div class="modal-body">
+          <form action="/doc/create/" id="myForm">
+            <div class="inputField">
+              <div>
+                <label for="fecha">Fecha:</label>
+                <input type="date" name="fecha" id="fecha" required />
+              </div>
+              <div>
+                <label for="numoficio">Num. Oficio:</label>
+                <input type="text" name="numoficio" id="numoficio" required />
+              </div>
+              <div>
+                <label for="asunto">Asunto:</label>
+                <input type="text" name="asunto" id="asunto" required />
+              </div>
+              <div>
+                <label for="remitente">Remitente:</label>
+                <input type="text" name="remitente" id="remitente" required />
+              </div>
+            </div>
+            <button type="submit" id="submit_form" class="btn btn-primary submit">Crear</button>
+          </form>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% block scripts %}
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <!-- Option 1: Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.20.0/jquery.validate.min.js" integrity="sha512-WMEKGZ7L5LWgaPeJtw9MBM4i5w5OSBlSjTjCtSnvFJGSVD26gE5+Td12qN5pvWXhuWaWcVwF++F7aqu9cvqP0A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.blockUI/2.70/jquery.blockUI.min.js" integrity="sha512-eYSzo+20ajZMRsjxB6L7eyqo5kuXuS2+wEbbOkpaur+sA2shQameiJiWEzCIDwJqaB0a4a6tCuEvCOBHUg3Skg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdn.datatables.net/2.0.0/js/dataTables.js"></script>
+    <script src="https://cdn.datatables.net/2.0.0/js/dataTables.bootstrap5.js"></script>
+    <script>
+      $(document).ready(function () {
+        $('#documents').DataTable()
+      
+        const form = $('#myForm')
+      
+        form.validate()
+      
+        form.submit(function (e) {
+          e.preventDefault()
+      
+          var fecha = $('#fecha').val()
+          var numoficio = $('#numoficio').val()
+          var asunto = $('#asunto').val()
+          var remitente = $('#remitente').val()
+      
+          alert('Está por crear un nuevo registro')
+      
+          if (form.valid()) {
+            $.ajax({
+              url: '/doc/create/',
+              type: 'POST',
+              //dataType: 'json',
+              data: {
+                fecha: fecha,
+                numoficio: numoficio,
+                asunto: asunto,
+                remitente: remitente
+              },
+              beforeSend: function () {
+                $.blockUI()
+              },
+              success: function (data) {
+                // const json = JSON.parse(data);
+                location.reload()
+              },
+              complete: function () {
+                $.unblockUI()
+              },
+              error: function () {
+                alert('Ha ocurrido un error, intentalo de nuevo más tarde')
+              }
+            })
+          }
+        })
+      })
+    </script>
+  {% endblock %}
+{% endblock %}

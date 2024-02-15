@@ -7,6 +7,7 @@ from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from config.db import engine, Base, Sessionlocal
 from fastapi.templating import Jinja2Templates
 from typing import Annotated
+from datetime import date
 import crud
 
 doct = APIRouter()
@@ -23,30 +24,57 @@ db_dependecy  = Annotated[Session, Depends(get_db)]
 
 @doct.get("/doc", tags=["Bienvenida"], status_code=HTTP_200_OK)
 async def doc(request:Request, db:db_dependecy):
-    docs = db.query(model.doc.Doc).order_by(model.doc.Doc.id.desc())
-    return doctem.TemplateResponse("docs.html", {"request":request})
+    documents = db.query(model.doc.Doc).order_by(model.doc.Doc.id.desc())
+    return doctem.TemplateResponse("docs.html", {"request":request, "documents":documents})
+
+#! Crear Documento
+
+@doct.post("/doc/create/", tags=["Crear Documento"], status_code=HTTP_201_CREATED)
+async def creadoc(fecha:Annotated[date,Form()], numoficio:Annotated[str, Form()],
+                  asunto:Annotated[str,Form()], remitente:Annotated[str, Form()],
+                   db:db_dependecy):
+    new_doc = model.doc.Doc(fecha = fecha, numoficio = numoficio, 
+                             asunto = asunto, remitente = remitente)
+    db.add(new_doc)
+    db.commit()
+    return JSONResponse(status_code=HTTP_201_CREATED, content="Success")
+
+# ? Buscar por id para devolver a formulario
 
 
-@doct.post("/doc/crear", tags=["Crear Documento"], status_code=HTTP_201_CREATED, response_model=Id_Doc)
-async def created(doc:CrearDoc, db:db_dependecy):
-    return crud.crearD(db=db, doc=doc)
-
-@doct.get("/doc/bfecha", tags=["Busca por Fecha"], status_code=HTTP_200_OK)
-async def bfecha(fechadoc:str, db: db_dependecy):
-    bf = db.query(model.doc.Doc).filter(model.doc.Doc.fecha == fechadoc).all()
-    if bf is None:
-        raise HTTPException(status_code=HTTP_404_NOT_FOUND, detail="No existe el documento")
-    return bf
-
-@doct.get("/doc/boficio", tags=["Busqueda Oficio"], status_code=HTTP_200_OK)
-async def boficio(nofi:str, db:db_dependecy):
-    bo = db.query(model.doc.Doc).filter(model.doc.Doc.numoficio == nofi).first()
-    if bo is None:
-        raise HTTPException(status_code=HTTP_404_NOT_FOUND, detail="No existe el documento")
-    return bo
-@doct.put("/doc/actualizar", tags=["Actualizar Documento"], status_code=HTTP_202_ACCEPTED)
-async def acdoc(num_oficio:str,doc_ac:Doc_Schema, db:db_dependecy):
-    docact=db.query(model.doc.Doc).filter(model.doc.Doc.numoficio == num_oficio).update({"numoficio":doc_ac.numoficio,"asunto":doc_ac.asunto, "remitente":doc_ac.remitente, "turn":doc_ac.turn, "resp":doc_ac.resp, "femi":doc_ac.femi, "url":doc_ac.url})
-    if docact is None:
-        raise HTTPException(HTTP_404_NOT_FOUND, detail="Documento no encontrado")
-    return docact
+@doct.get("/doc/{doc_id}", tags=["Buscar id"], response_class=HTTP_200_OK)
+async def docid(doc_id:int, db:db_dependecy, request:Request):
+    search = db.query(model.doc.Doc).filter(model.doc.Doc.id == doc_id).first()
+    if search:
+        return doctem.TemplateResponse(
+            "editdoc.html", {"request": request, "search": search}
+        )
+@doct.post("/doc/update/{doc_id}", tags=["Modificar Documento"], response_class=HTTP_202_ACCEPTED)
+async def modificar(
+    doc_id: int,
+    db: db_dependecy,
+    fecha: Annotated[date, Form()],
+    numoficio: Annotated[str, Form()],
+    asunto: Annotated[str, Form()],
+    remitente: Annotated[str, Form()],
+    turn:Annotated[str, Form()],
+    resp:Annotated[str,Form()],
+    femi:Annotated[date, Form()],
+    url:Annotated[str, Form()],
+    urlresp:Annotated[str, Form()],
+    request: Request,
+):
+    doc_act = db.query(model.doc.Doc).filter(model.doc.Doc.id == doc_id).update({
+        "fecha" : fecha, 
+        "numoficio" : numoficio,
+        "asunto" :asunto, 
+        remitente : remitente,
+        "turn": turn,
+        "resp": resp,
+        "femi": femi,
+        "url": url,
+        "urlresp":urlresp
+    })
+    db.commit
+    path = doct.url_path_for("doc")
+    return RedirectResponse(url = path, status_code=303)

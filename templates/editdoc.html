@@ -1,0 +1,42 @@
+{% extends 'base2.html' %}
+{% block content %}
+  <div class="btn-text-right" style="text-align: right;">
+    <a href="/doc"><button type="button" class="btn btn-primary">Cancelar</button></a>
+  </div>
+  <div class="container" style="text-align: center;">
+    <div class="abs-center">
+      <form action="/doc/update/{{ search.id }}" method="post">
+        <div class="mb-3">
+          <label>Fecha</label>
+          <input type="date" name="fecha" placeholder="fecha" class="form-control" value="{{ search.fecha }}" />
+        </div>
+        <div class="mb-3">
+          <label>Num. Oficio</label>
+          <input type="text" name="numoficio" placeholder="Numero de Oficio" class="form-control" value="{{ search.numoficio }}" />
+        </div>
+        <div class="mb-3">
+          <label>Asunto</label>
+          <input type="text" name="asunto" placeholder="Asunto" class="form-control" value="{{ search.asunto }}" />
+        </div>
+        <div class="mb-3">
+          <label>Remitente</label>
+          <input type="text" name="remitente" placeholder="Remitente" class="form-control" value="{{ search.remitente }}" />
+        </div>
+        <div class="mb-3">
+          <label>Turnado a:</label>
+          <input type="text" name="turn" placeholder="Turnado a:" class="form-control" value="{{ search.turn }}" />
+        </div>
+        <div class="mb-3">
+          <label>Respuesta:</label>
+          <input type="text" name="resp" placeholder="respuesta" class="form-control" value="{{ search.resp }}" />
+        </div>
+        <div class="mb-3">
+          <label>Fecha de Respuesta:</label>
+          <input type="date" name="femi" placeholder="Fecha de Respuesta" class="form-control" value="{{ search.resp }}" />
+        </div>
+
+        <input type="submit" value="Update" class="btn btn-primary mb-3" />
+      </form>
+    </div>
+  </div>
+{% endblock %}
