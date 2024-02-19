@@ -4,7 +4,7 @@
     <a href="/doc"><button type="button" class="btn btn-primary">Cancelar</button></a>
   </div>
   <div class="container" style="text-align: center;">
-    <div class="abs-center">
+    <div class="abs-center" style="text-align: center;">
       <form action="/doc/update/{{ search.id }}" method="post">
         <div class="mb-3">
           <label>Fecha</label>
@@ -22,9 +22,15 @@
           <label>Remitente</label>
           <input type="text" name="remitente" placeholder="Remitente" class="form-control" value="{{ search.remitente }}" />
         </div>
-        <div class="mb-3">
-          <label>Turnado a:</label>
-          <input type="text" name="turn" placeholder="Turnado a:" class="form-control" value="{{ search.turn }}" />
+        <div>
+          <label for="remitente">Turnado a:</label>
+          <select name="turn" id="turn">
+            <option value="No">No Turnado</option>
+            <option value="Investigación">Investigación</option>
+            <option value="Formación de Rh">Formación de RH</option>
+            <option value="Capacitación">Capacitación</option>
+            <option value="Telemedicina">Telemedicina</option>
+          </select>
         </div>
         <div class="mb-3">
           <label>Respuesta:</label>
@@ -32,7 +38,15 @@
         </div>
         <div class="mb-3">
           <label>Fecha de Respuesta:</label>
-          <input type="date" name="femi" placeholder="Fecha de Respuesta" class="form-control" value="{{ search.resp }}" />
+          <input type="date" name="femi" placeholder="Fecha de Respuesta" class="form-control" value="{{ search.femi}}" />
+        </div>
+        <div class="mb-3">
+          <label>Documento Escaneado:</label>
+          <input type="text" name="url" placeholder="Documento Escaneado" class="form-control" value="{{ search.url }}" />
+        </div>
+        <div class="mb-3">
+          <label>Respuesta Escaneada:</label>
+          <input type="text" name="urlresp" placeholder="Respuesta Escaneada" class="form-control" value="{{ search.urlresp }}" />
         </div>
 
         <input type="submit" value="Update" class="btn btn-primary mb-3" />

@@ -116,6 +116,7 @@ async def borrar(id:int,db: db_dependecy, request:Request):
     url = usr.url_path_for("admin")
     return RedirectResponse(url=url, status_code=303)
 
+#?Login
 
 @usr.post("/usr/login", tags=["Login"], status_code=HTTP_202_ACCEPTED, response_class=RedirectResponse)
 async def login(

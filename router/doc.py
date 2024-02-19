@@ -29,15 +29,27 @@ async def doc(request:Request, db:db_dependecy):
 
 #! Crear Documento
 
+
 @doct.post("/doc/create/", tags=["Crear Documento"], status_code=HTTP_201_CREATED)
-async def creadoc(fecha:Annotated[date,Form()], numoficio:Annotated[str, Form()],
-                  asunto:Annotated[str,Form()], remitente:Annotated[str, Form()],
-                   db:db_dependecy):
+async def creadoc(
+    fecha: Annotated[date, Form()],
+    numoficio: Annotated[str, Form()],
+    asunto: Annotated[str, Form()],
+    remitente: Annotated[str, Form()],
+    turn: Annotated[str, Form()],
+    resp: Annotated[str, Form()],
+    femi: Annotated[date, Form()],
+    url: Annotated[str, Form()],
+    urlresp: Annotated[str, Form()],
+    db: db_dependecy,
+):
     new_doc = model.doc.Doc(fecha = fecha, numoficio = numoficio, 
-                             asunto = asunto, remitente = remitente)
+                             asunto = asunto, remitente = remitente, turn=turn, 
+                             resp=resp, femi=femi, url=url, urlresp=urlresp)
     db.add(new_doc)
     db.commit()
     return JSONResponse(status_code=HTTP_201_CREATED, content="Success")
+
 
 # ? Buscar por id para devolver a formulario
 
@@ -68,13 +80,24 @@ async def modificar(
         "fecha" : fecha, 
         "numoficio" : numoficio,
         "asunto" :asunto, 
-        remitente : remitente,
+        "remitente" : remitente,
         "turn": turn,
         "resp": resp,
         "femi": femi,
         "url": url,
         "urlresp":urlresp
     })
-    db.commit
-    path = doct.url_path_for("doc")
-    return RedirectResponse(url = path, status_code=303)
+    if doc_act:
+        db.commit()
+        path = doct.url_path_for("doc")
+        return RedirectResponse(url = path, status_code=303)
+
+#?Borrar Documentos    
+
+@doct.get("/doc/borrar/{id_doc}", tags=["Borrar Documento"], status_code=HTTP_200_OK)
+async def borrar(id_doc:int, db:db_dependecy, request:Request):
+    buscar = db.query(model.doc.Doc).filter(model.doc.Doc.id == id_doc).first()
+    db.delete(buscar)
+    db.commit()
+    url= doct.url_path_for("doc")
+    return RedirectResponse(url = url, status_code=303)

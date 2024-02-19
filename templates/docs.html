@@ -17,7 +17,7 @@
               <th>Num.Oficio</th>
               <th>Asunto</th>
               <th>Remitente</th>
-              <th>Turno</th>
+              <th>Turnado</th>
               <th>Respuesta</th>
               <th>Fecha de Emisión</th>
               <th>Herramientas</th>
@@ -36,7 +36,7 @@
                 <td>{{ docs.resp }}</td>
                 <td>{{ docs.femi }}</td>
                 <td>
-                  <a href="/doc/{{ docs.id }}" class="btn btn-success">Editar</a> <a href="/usr/borrar/{{ docs.id }}" class="btn btn-danger">Borrar</a>
+                  <a href="/doc/{{ docs.id }}" class="btn btn-success">Editar</a> <a href="/doc/borrar/{{ docs.id }}" class="btn btn-danger">Borrar</a>
                 </td>
               </tr>
             {% endfor %}
@@ -74,6 +74,32 @@
                 <label for="remitente">Remitente:</label>
                 <input type="text" name="remitente" id="remitente" required />
               </div>
+              <div>
+                <label for="remitente">Turnado a:</label>
+                <select name="turn" id="turn">
+                  <option value="No">No Turnado</option>
+                  <option value="Investigación">Investigación</option>
+                  <option value="Formación de Rh">Formación de RH</option>
+                  <option value="Capacitación">Capacitación</option>
+                  <option value="Telemedicina">Telemedicina</option>
+                </select>
+              </div>
+              <div>
+                <label for="resp">Respuesta Num. Ofico:</label>
+                <input type="text" name="resp" id="resp" required />
+              </div>
+              <div>
+                <label for="femi">Fecha de Respuesta:</label>
+                <input type="date" name="femi" id="femi" required />
+              </div>
+              <div>
+                <label for="url">Url de Documento Recibido:</label>
+                <input type="text" name="url" id="url" required />
+              </div>
+              <div>
+                <label for="urlresp">Url de Documento Respuesta:</label>
+                <input type="text" name="urlresp" id="urlresp" required />
+              </div>
             </div>
             <button type="submit" id="submit_form" class="btn btn-primary submit">Crear</button>
           </form>
@@ -108,6 +134,11 @@
           var numoficio = $('#numoficio').val()
           var asunto = $('#asunto').val()
           var remitente = $('#remitente').val()
+          var turn = $('#turn').val()
+          var resp = $('#resp').val()
+          var femi = $('#femi').val()
+          var url = $('#url').val()
+          var urlresp = $('#urlresp').val()
       
           alert('Está por crear un nuevo registro')
       
@@ -120,7 +151,12 @@
                 fecha: fecha,
                 numoficio: numoficio,
                 asunto: asunto,
-                remitente: remitente
+                remitente: remitente,
+                turn:turn,
+                resp:resp,
+                femi:femi,
+                url:url,
+                urlresp:urlresp
               },
               beforeSend: function () {
                 $.blockUI()
