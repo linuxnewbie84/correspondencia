@@ -27,6 +27,11 @@ async def doc(request:Request, db:db_dependecy):
     documents = db.query(model.doc.Doc).order_by(model.doc.Doc.id.desc())
     return doctem.TemplateResponse("docs.html", {"request":request, "documents":documents})
 
+@doct.get("/docnor", tags=["Documentos Turnados"], status_code=200)
+async def tunados(request:Request, db:db_dependecy):
+    turnados= db.query(model.doc.Doc).order_by(model.doc.Doc.id. desc())
+    return doctem.TemplateResponse("turn.html",{"request":request, "turnados":turnados})
+
 #! Crear Documento
 
 

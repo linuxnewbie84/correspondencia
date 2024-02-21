@@ -116,7 +116,7 @@ async def borrar(id:int,db: db_dependecy, request:Request):
     url = usr.url_path_for("admin")
     return RedirectResponse(url=url, status_code=303)
 
-#?Login
+# ?Login
 
 @usr.post("/usr/login", tags=["Login"], status_code=HTTP_202_ACCEPTED, response_class=RedirectResponse)
 async def login(
@@ -136,8 +136,21 @@ async def login(
             return RedirectResponse(url = url, status_code=303)
         else:
             return admintem.TemplateResponse("index.html", {"request": request})
-    if log_s != None:
+    if log_s != None and username == "DocOlea": 
         contra = check_password_hash(log_s.user_password, user_password)
         if contra:
             return RedirectResponse(url="/doc", status_code=303)
-    return admintem.TemplateResponse("index.html", {"request": request})
+        else:
+            return admintem.TemplateResponse("index.html", {"request": request})
+    if log_s != None and username == "MFuentes":
+        contra = check_password_hash(log_s.user_password, user_password)
+        if contra:
+            return RedirectResponse(url="/doc", status_code=303)
+        else:
+            return admintem.TemplateResponse("index.html", {"request": request})
+    if log_s != None:
+        contra = check_password_hash(log_s.user_password, user_password)
+        if contra:
+            return RedirectResponse(url="/docnor", status_code=303)
+        else:
+            return admintem.TemplateResponse("index.html",{"request":request})
