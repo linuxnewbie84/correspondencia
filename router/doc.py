@@ -106,3 +106,13 @@ async def borrar(id_doc:int, db:db_dependecy, request:Request):
     db.commit()
     url= doct.url_path_for("doc")
     return RedirectResponse(url = url, status_code=303)
+
+#!Mostar url
+
+@doct.get("/doc/show/{doc_id}", tags=["Mostrar documento"], status_code=200)
+async def show(doc_id:int, db:db_dependecy, request:Request):
+    bus = db.query(model.doc.Doc).filter(model.doc.Doc.id == doc_id).first()
+    if bus:
+        return doctem.TemplateResponse(
+            "showturn.html", {"request":request, "bus":bus}
+        )
